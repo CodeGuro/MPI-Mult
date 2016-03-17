@@ -1,0 +1,6 @@
+Debug/
+Release/
+/.vs/
+*.suo
+*.sdf
+/prog2.VC.opendb
