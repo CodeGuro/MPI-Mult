@@ -16,7 +16,7 @@ void init_mat( matrix_t *matrix, const char *filepath )
 
 	// fill the matrix size
 	char *buff = malloc( 128 * sizeof( char ) );
-	matrix->size = atoi( gets( hfile ) );
+	matrix->size = atoi( fgets( buff, 128, hfile ) );
 	free( buff );
 
 	// fill the matrix data
@@ -26,7 +26,7 @@ void init_mat( matrix_t *matrix, const char *filepath )
 		matrix->mat[ it ] = malloc( matrix->size * sizeof( float ) );
 		
 		for( int it2 = 0; it2 < matrix->size; ++it2 )
-			fscanf( hfile, "%f", (matrix->mat) + it2 );
+			fscanf( hfile, "%f", matrix->mat[ it ] + it2 );
 	}
 
 	fclose( hfile );
@@ -48,8 +48,9 @@ void print_mat( const matrix_t *matrix )
 	printf( "Matrix size: %i\nMatrix contents:\n", matrix->size );
 	for( int i = 0; i < matrix->size; ++i )
 	{
+		// neat spacing in printing
 		for( int j = 0; j < matrix->size; ++j )
-			printf( "%f", matrix->mat[ i ][ j ] );
+			printf( matrix->mat[ i ][ j ] < 0.f ? "%.1f\t" : " %.1f\t", matrix->mat[ i ][ j ] );
 		printf( "\n" );
 	}
 }
@@ -63,7 +64,10 @@ int main( int argc, char **argv )
 
 	if( rank == 0 ) // parent
 	{
-
+		matrix_t matrix;
+		init_mat( &matrix, "inmatrix12" );
+		print_mat( &matrix );
+		destroy_mat( &matrix );
 	}
 	else // child
 	{
