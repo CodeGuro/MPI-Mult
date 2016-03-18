@@ -154,7 +154,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="matrix.c" />
     <ClCompile Include="prog2.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="matrix.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
