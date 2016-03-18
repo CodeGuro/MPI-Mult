@@ -48,7 +48,7 @@ void destroy_mat( matrix_t *matrix )
 	free( matrix->mat );
 }
 
-// API function to destroy the matrix generated from 1
+// API function to free resources generated from init_mat_arr
 void destroy_mat_arr( matrix_t *matrix )
 {
 	destroy_mat( matrix + 0 );
