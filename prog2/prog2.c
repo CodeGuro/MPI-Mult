@@ -49,46 +49,78 @@ int main( int argc, char **argv )
 	matrix_t *sub2 = alloc_mat( sub_size, NULL );
 	matrix_t *sub3 = alloc_mat( sub_size, NULL );
 
+	// root-specific vars
+	float *mat_set_rows;
+	float *mat_set_cols;
+	float *mat_set_Cvec;
+
+	if( rank == 0 )
+	{
+		mat_set_rows = malloc( sub_size*sub_size * steps * sizeof( float ) );
+		mat_set_cols = malloc( sub_size*sub_size * steps * sizeof( float ) );
+		mat_set_Cvec = malloc( sub_size*sub_size * steps * sizeof( float ) );
+	}
+
 	for( int i = 0; i < steps; ++i )
 	{
+		if( rank == 0 )
+		{
+			matrix_t *tmp = alloc_mat( sub_size, NULL );
+			for( int k = 0; k < steps; ++k )
+			{
+				get_sub_mat( tmp, m1, i, k );
+				copy_buff_mat( mat_set_rows, tmp, k );
+			}
+			destroy_mat( tmp );
+		}
+
+		// scatter mat_set_rows to so submat i goes to sub1 in process i
+		MPI_Scatter( mat_set_rows, sub_size*sub_size*steps, MPI_FLOAT, sub1, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+
 		for( int j = 0; j < steps; ++j )
 		{
-			zero_mat( sub3 );
-			float *mat_row_m1;
-			float *mat_col_m2;
-			float *adding_mat_set;
 			if( rank == 0 )
 			{
-				// copy the sub-matrices in rows/columns to distribute to each process
-				mat_row_m1 = malloc( sub_size*sub_size*steps * sizeof( float ) );
-				mat_col_m2 = malloc( sub_size*sub_size*steps * sizeof( float ) );
-				adding_mat_set = malloc( sub_size*sub_size*steps * sizeof( float ) );
+				matrix_t *tmp = alloc_mat( sub_size, NULL );
 				for( int k = 0; k < steps; ++k )
 				{
-					get_sub_mat( sub1, m1, i, k );
-					copy_buff_mat( mat_row_m1, sub1, k );
-					get_sub_mat( sub2, m2, k, j );
-					copy_buff_mat( mat_col_m2, sub2, k );
+					get_sub_mat( tmp, m2, k, j );
+					copy_buff_mat( mat_set_cols, tmp, k );
 				}
+				destroy_mat( tmp );
 			}
 
-			// scatter the submatrices
-			MPI_Scatter( mat_row_m1, sub_size*sub_size*steps, MPI_FLOAT, sub1, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
-			MPI_Scatter( mat_col_m2, sub_size*sub_size*steps, MPI_FLOAT, sub2, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+			// scatter mat_set_cols to so submat j goes to sub2 in process j
+			MPI_Scatter( mat_set_cols, sub_size*sub_size, MPI_FLOAT, sub2, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
 
-			// matrix multiplication is done locally
+			// perform matrix multiplication here
 			multiply_mat( sub3, sub1, sub2 );
 
-			// gather the submatrices into the root process
-			MPI_Gather( sub3, sub_size*sub_size, MPI_FLOAT, adding_mat_set, sub_size*sub_size*steps, MPI_FLOAT, 0, MPI_COMM_WORLD );
+			// gather c-set at root
+			MPI_Gather( sub3->mat, sub_size*sub_size, MPI_FLOAT, mat_set_Cvec, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
 
+			// add the c-set at root to C( i, j )
 			if( rank == 0 )
 			{
-				free( adding_mat_set );
-				free( mat_col_m2 );
-				free( mat_row_m1 );
+				zero_mat( sub3 );
+				matrix_t *tmp = alloc_mat( sub_size, NULL );
+				for( int k = 0; k < steps; ++k )
+				{
+					copy_mat_buff( mat_set_Cvec, tmp, k );
+					add_mat( sub3, tmp, sub3 );
+				}
+				destroy_mat( tmp );
+
+				set_sub_mat( m3, sub3, i, j );
 			}
 		}
+	}
+
+	if( rank == 0 )
+	{
+		free( mat_set_Cvec );
+		free( mat_set_cols );
+		free( mat_set_rows );
 	}
 
 	print_mat( m3 );

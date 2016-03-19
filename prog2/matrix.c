@@ -136,8 +136,14 @@ void add_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 )
 	destroy_mat( tmp_mat );
 }
 
-// API function to copy the buffer at the offset (in matrices)
+// API function to write to the buffer the contents of the matrix at the offset (in matrices)
 void copy_buff_mat( float *buff, matrix_t *src, int idx )
 {
 	memcpy( buff + src->size * src->size * sizeof(float) * idx , src->mat, src->size * src->size * sizeof( float ) );
+}
+
+// API function to write to the matrix the contents of the buffer at the offset (in matrices)
+void copy_mat_buff( float *buff, matrix_t *dest, int idx )
+{
+	memcpy( dest->mat, buff + dest->size * dest->size * sizeof( float ) * idx, dest->size * dest->size * sizeof( float ) );
 }
