@@ -15,8 +15,6 @@ int main( int argc, char **argv )
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPI_Comm_size( MPI_COMM_WORLD, &p );
 
-	p = 1; // debug only
-
 	// read the matrix
 	if( rank == 0 )
 	{
@@ -65,6 +63,7 @@ int main( int argc, char **argv )
 	{
 		if( rank == 0 )
 		{
+		
 			matrix_t *tmp = alloc_mat( sub_size, NULL );
 			for( int k = 0; k < steps; ++k )
 			{
@@ -72,12 +71,15 @@ int main( int argc, char **argv )
 				copy_buff_mat( mat_set_rows, tmp, k );
 			}
 			destroy_mat( tmp );
+		
 		}
 
 		// scatter mat_set_rows to so submat i goes to sub1 in process i
-		MPI_Scatter( mat_set_rows, sub_size*sub_size, MPI_FLOAT, sub1->mat, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+//		MPI_Scatter( mat_set_rows, sub_size*sub_size, MPI_FLOAT, sub1->mat, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
 
 		print_mat( sub1 );
+
+		MPI_Barrier( MPI_COMM_WORLD );
 
 		for( int j = 0; j < steps; ++j )
 		{
@@ -93,13 +95,13 @@ int main( int argc, char **argv )
 			}
 
 			// scatter mat_set_cols to so submat j goes to sub2 in process j
-			MPI_Scatter( mat_set_cols, sub_size*sub_size, MPI_FLOAT, sub2->mat, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+//			MPI_Scatter( mat_set_cols, sub_size*sub_size, MPI_FLOAT, sub2->mat, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
 
 			// perform matrix multiplication here
 			multiply_mat( sub3, sub1, sub2 );
 
 			// gather c-set at root
-			MPI_Gather( sub3->mat, sub_size*sub_size, MPI_FLOAT, mat_set_Cvec, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+//			MPI_Gather( sub3->mat, sub_size*sub_size, MPI_FLOAT, mat_set_Cvec, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
 
 			// add the c-set at root to C( i, j )
 			if( rank == 0 )
@@ -125,8 +127,6 @@ int main( int argc, char **argv )
 		free( mat_set_rows );
 	}
 
-	print_mat( m3 );
-
 	// free the resources
 	destroy_mat( sub3 );
 	destroy_mat( sub2 );
@@ -134,6 +134,7 @@ int main( int argc, char **argv )
 
 	if( rank == 0 )
 	{
+	//	print_mat( m3 );
 		destroy_mat( m3 );
 		destroy_mat( m2 );
 		destroy_mat( m1 );

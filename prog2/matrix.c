@@ -126,7 +126,7 @@ void add_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 )
 		return;
 
 	int size = dest->size;
-	int tmp_mat = alloc_mat( size, NULL );
+	matrix_t *tmp_mat = alloc_mat( size, NULL );
 
 	for( int i = 0; i < size; ++i )
 		for( int j = 0; j < size; ++j )
@@ -139,11 +139,11 @@ void add_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 )
 // API function to write to the buffer the contents of the matrix at the offset (in matrices)
 void copy_buff_mat( float *buff, matrix_t *src, int idx )
 {
-	memcpy( buff + src->size * src->size * sizeof(float) * idx , src->mat, src->size * src->size * sizeof( float ) );
+	memcpy( buff + src->size * src->size * idx , src->mat, src->size * src->size * sizeof( float ) );
 }
 
 // API function to write to the matrix the contents of the buffer at the offset (in matrices)
 void copy_mat_buff( float *buff, matrix_t *dest, int idx )
 {
-	memcpy( dest->mat, buff + dest->size * dest->size * sizeof( float ) * idx, dest->size * dest->size * sizeof( float ) );
+	memcpy( dest->mat, buff + dest->size * dest->size * idx, dest->size * dest->size * sizeof( float ) );
 }
