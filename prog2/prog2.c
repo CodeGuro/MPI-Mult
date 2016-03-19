@@ -10,6 +10,7 @@ int main( int argc, char **argv )
 	int rank;
 	int p;
 	int n; // matrix size
+	matrix_t *m1, *m2, *m3;  // used by root only
 	MPI_Init( &argc, &argv );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPI_Comm_size( MPI_COMM_WORLD, &p );
@@ -19,21 +20,10 @@ int main( int argc, char **argv )
 	{
 		FILE *hfile = fopen( "inmatrix12", "r" );
 		fscanf( hfile, "%i", &n );
-		matrix_t *m1 = alloc_mat( n, hfile );
-		matrix_t *m2 = alloc_mat( n, hfile );
-		matrix_t *m3 = alloc_mat( n, NULL );
+		m1 = alloc_mat( n, hfile );
+		m2 = alloc_mat( n, hfile );
+		m3 = alloc_mat( n, hfile );
 		fclose( hfile );
-		//print_mat( m1 );
-		//print_mat( m2 );
-		multiply_mat( m3, m1, m2 );
-
-		matrix_t *m4 = alloc_mat( 4, NULL );
-		sub_mat( m4, m3, 1, 1 );
-		print_mat( m4 );
-		destroy_mat( m4 );
-		destroy_mat( m3 );
-		destroy_mat( m2 );
-		destroy_mat( m1 );
 	}
 
 	// broadcast the size of the matrix
@@ -48,15 +38,36 @@ int main( int argc, char **argv )
 		exit( 1 );
 	}
 
-	int steps = p / n; // number of submatrices to evaluate per process
+	int steps = n / p; // number of submatrices to evaluate per process
+	int sub_size = n / steps; // size of the submatrices
+
+	// allocate the sub-matrices
+	matrix_t *sub1 = alloc_mat( sub_size, NULL );
+	matrix_t *sub2 = alloc_mat( sub_size, NULL );
+	matrix_t *sub3 = alloc_mat( sub_size, NULL );
+
+	for( int i = 0; i < steps; ++i )
+	{
+		for( int j = 0; j < steps; ++j )
+		{
+			if( rank == 0 )
+				zero_mat( sub3 );
+			for( int k = 0; k < steps; ++k )
+			{
+			}
+		}
+	}
+
+	// free the resources
+	destroy_mat( sub3 );
+	destroy_mat( sub2 );
+	destroy_mat( sub1 );
 
 	if( rank == 0 )
 	{
-		// partition the matrix and broadcast it to the processes
-	}
-	else
-	{
-
+		destroy_mat( m3 );
+		destroy_mat( m2 );
+		destroy_mat( m1 );
 	}
 
 	MPI_Finalize();

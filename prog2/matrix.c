@@ -38,6 +38,12 @@ void print_mat( const matrix_t *matrix )
 	}
 }
 
+// API function to set all matrix elements to zero
+void zero_mat( matrix_t *matrix )
+{
+	memset( matrix->mat, 0, matrix->size * matrix->size * sizeof( float ) );
+}
+
 // API function to access a matrix element
 float *element_mat( matrix_t *matrix, int i, int j )
 {
@@ -71,7 +77,7 @@ void multiply_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 )
 		return;
 
 	int size = dest->size;
-	memset( dest->mat, 0, size*size * sizeof( float ) );
+	zero_mat( dest );
 
 	for( int i = 0; i < size; ++i )
 		for( int j = 0; j < size; ++j )
@@ -80,13 +86,24 @@ void multiply_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 )
 
 }
 
-// API function to fill dest with the (i,j)th submatrix of src
-void sub_mat( matrix_t *dest, matrix_t *src, int i, int j )
+// API function to get the (i,j)th submatrix from src
+void get_sub_mat( matrix_t *dest, matrix_t *src, int i, int j )
 {
 	for( int k = 0; k < dest->size * dest->size; ++k )
 	{
 		int ii = k / dest->size;
 		int jj = k % dest->size;
 		*element_mat( dest, ii, jj ) = *element_mat( src, dest->size * i + ii, dest->size * j + jj );
+	}
+}
+
+// API function to set the (i,j)th submatrix to dest
+void set_sub_mat( matrix_t *dest, matrix_t *src, int i, int j )
+{
+	for( int k = 0; k < dest->size * dest->size; ++k )
+	{
+		int ii = k / src->size;
+		int jj = k % src->size;
+		*element_mat( dest, src->size * i + ii, src->size * j + jj ) = *element_mat( src, ii, jj );
 	}
 }
