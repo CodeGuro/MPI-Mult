@@ -1,10 +1,13 @@
-all: prog2
+CC = mpicc
+CFLAGS = --std=c99
+DEPS = matrix.h
+OBJ = matrix.o prog2.o
 
-prog2: prog2.o
-	mpicc prog2.o -o prog2
+%.o: %.c $(DEPS)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-prog2.o: prog2.c
-	mpicc --std=c99 -c prog2.c -o prog2.o
+prog2: $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
 	rm -f *.o prog2
