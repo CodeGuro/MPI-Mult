@@ -25,17 +25,24 @@ void destroy_mat( matrix_t *matrix )
 }
 
 // API function to display contents of matrix
-void print_mat( const matrix_t *matrix, const char *name )
+void print_mat( const matrix_t *matrix, const char *name, FILE *hfile )
 {
 	printf( "%s, size: %i\n", name, matrix->size );
+	if( hfile ) fprintf( hfile, "%s, size: %i\n", name, matrix->size );
 	for( int i = 0; i < matrix->size; ++i )
 	{
 		// neat spacing in printing
 		for( int j = 0; j < matrix->size; ++j )
+		{
 			printf( matrix->mat[ i * matrix->size + j ] < 0.f ? "%.1f\t" : " %.1f\t", matrix->mat[ i * matrix->size + j ] );
+			if( hfile )
+				fprintf( hfile, matrix->mat[ i * matrix->size + j ] < 0.f ? "%.1f\t" : " %.1f\t", matrix->mat[ i * matrix->size + j ] );
+		}
 		printf( "\n" );
+		if( hfile )	fprintf( hfile, "\n" );
 	}
 	printf( "\n" );
+	if( hfile ) fprintf( hfile, "\n" );
 }
 
 // API function to copy a matrix from src to dest

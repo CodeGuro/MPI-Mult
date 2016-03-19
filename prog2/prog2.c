@@ -11,6 +11,7 @@ int main( int argc, char **argv )
 	int p;
 	int n; // matrix size
 	matrix_t *m1, *m2, *m3;  // used by root only
+	FILE *hfout = NULL;
 	MPI_Init( &argc, &argv );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPI_Comm_size( MPI_COMM_WORLD, &p );
@@ -23,9 +24,6 @@ int main( int argc, char **argv )
 		m1 = alloc_mat( n, hfile );
 		m2 = alloc_mat( n, hfile );
 		fclose( hfile );
-		print_mat( m1, "Matrix A" );
-		print_mat( m2, "Matrix B" );
-
 		m3 = alloc_mat( n, NULL );
 	}
 
@@ -39,6 +37,14 @@ int main( int argc, char **argv )
 			printf( "matrix size not divisible by proc count!\n" );
 		MPI_Finalize();
 		exit( 1 );
+	}
+	else if( rank == 0 )
+	{
+		char filename_buff[ 512 ] = { 0 };
+		sprintf( filename_buff, "outfile%i", n );
+		hfout = fopen( filename_buff, "w" );
+		print_mat( m1, "Matrix A", hfout );
+		print_mat( m2, "Matrix B", hfout );
 	}
 
 	const int sub_size = n / p; // size of the submatrices
@@ -132,7 +138,8 @@ int main( int argc, char **argv )
 
 	if( rank == 0 )
 	{
-		print_mat( m3, "Matrix C" );
+		print_mat( m3, "Product Matrix C", hfout );
+		fclose( hfout );
 		destroy_mat( m3 );
 		destroy_mat( m2 );
 		destroy_mat( m1 );
