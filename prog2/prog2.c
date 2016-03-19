@@ -61,8 +61,13 @@ int main( int argc, char **argv )
 				matrix_t *tmp = alloc_mat( sub_size, NULL );
 				multiply_mat( tmp, sub1, sub2 );
 				add_mat( sub3, sub3, tmp );
+				print_mat( sub1 );
+				print_mat( sub2 );
+				print_mat( tmp );
+				print_mat( sub3 );
 				destroy_mat( tmp );
 			}
+			print_mat( sub3 );
 			set_sub_mat( m3, sub3, i, j );
 		}
 	}

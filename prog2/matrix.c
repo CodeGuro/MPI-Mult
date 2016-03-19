@@ -44,7 +44,7 @@ void copy_mat( matrix_t *dest, matrix_t *src )
 	if( dest->size != src->size )
 		return;
 	int size = dest->size;
-	memcpy( dest->mat, src->mat, size * size );
+	memcpy( dest->mat, src->mat, size * size * sizeof( float ) );
 }
 
 // API function to set all matrix elements to zero
