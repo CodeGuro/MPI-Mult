@@ -61,9 +61,9 @@ int main( int argc, char **argv )
 
 	for( int i = 0; i < steps; ++i )
 	{
+		// initialize the matrix rows so process k gets submatrix A(i,k)
 		if( rank == 0 )
 		{
-		
 			matrix_t *tmp = alloc_mat( sub_size, NULL );
 			for( int k = 0; k < steps; ++k )
 			{
@@ -71,16 +71,12 @@ int main( int argc, char **argv )
 				copy_buff_mat( mat_set_rows, tmp, k );
 			}
 			destroy_mat( tmp );
-		
 		}
 
-		// scatter mat_set_rows to so submat i goes to sub1 in process i
-//		MPI_Scatter( mat_set_rows, sub_size*sub_size, MPI_FLOAT, sub1->mat, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+		// scatter the matrix rows
+		MPI_Scatter( rank == 0 ? mat_set_rows : NULL, sub_size*sub_size, MPI_FLOAT, sub1->mat, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
 
-		print_mat( sub1 );
-
-		MPI_Barrier( MPI_COMM_WORLD );
-
+		// initialize the matrix rows so process k gets submatrix B(k,j)
 		for( int j = 0; j < steps; ++j )
 		{
 			if( rank == 0 )
@@ -94,16 +90,16 @@ int main( int argc, char **argv )
 				destroy_mat( tmp );
 			}
 
-			// scatter mat_set_cols to so submat j goes to sub2 in process j
-//			MPI_Scatter( mat_set_cols, sub_size*sub_size, MPI_FLOAT, sub2->mat, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+			// scatter the matrix columns
+			MPI_Scatter( rank == 0 ? mat_set_cols : NULL, sub_size*sub_size, MPI_FLOAT, sub2->mat, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
 
-			// perform matrix multiplication here
+			// perform matrix multiplication locally
 			multiply_mat( sub3, sub1, sub2 );
 
 			// gather c-set at root
-//			MPI_Gather( sub3->mat, sub_size*sub_size, MPI_FLOAT, mat_set_Cvec, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+			MPI_Gather( sub3->mat, sub_size*sub_size, MPI_FLOAT, rank == 0 ? mat_set_Cvec : NULL, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
 
-			// add the c-set at root to C( i, j )
+			// add the c-set as a vector of matrices, store the result in submatrix C(i,j)
 			if( rank == 0 )
 			{
 				zero_mat( sub3 );
@@ -115,7 +111,7 @@ int main( int argc, char **argv )
 				}
 				destroy_mat( tmp );
 
-				set_sub_mat( m3, sub3, i, j );
+				set_sub_mat( m3, sub3, i, j ); // C(i,j) = summed_submatrix
 			}
 		}
 	}
@@ -134,7 +130,7 @@ int main( int argc, char **argv )
 
 	if( rank == 0 )
 	{
-	//	print_mat( m3 );
+		print_mat( m3 );
 		destroy_mat( m3 );
 		destroy_mat( m2 );
 		destroy_mat( m1 );
