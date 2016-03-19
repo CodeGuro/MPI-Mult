@@ -11,7 +11,9 @@ typedef struct
 matrix_t *alloc_mat( int size, FILE *hfile );
 void destroy_mat( matrix_t *matrix );
 void print_mat( const matrix_t *matrix );
+void copy_mat( matrix_t *dest, matrix_t *src );
 void transpose_mat( matrix_t *matrix );
 void multiply_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 );
 void get_sub_mat( matrix_t *dest, matrix_t *src, int i, int j );
-void set_sub_mat( matrix_t *dest, matrix_t *src, int i, int j )
+void set_sub_mat( matrix_t *dest, matrix_t *src, int i, int j );
+void add_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 );

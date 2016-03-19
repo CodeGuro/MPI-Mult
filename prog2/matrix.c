@@ -38,6 +38,15 @@ void print_mat( const matrix_t *matrix )
 	}
 }
 
+// API function to copy a matrix from src to dest
+void copy_mat( matrix_t *dest, matrix_t *src )
+{
+	if( dest->size != src->size )
+		return;
+	int size = dest->size;
+	memcpy( dest->mat, src->mat, size * size );
+}
+
 // API function to set all matrix elements to zero
 void zero_mat( matrix_t *matrix )
 {
@@ -77,13 +86,16 @@ void multiply_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 )
 		return;
 
 	int size = dest->size;
-	zero_mat( dest );
+	matrix_t *tmp_mat = alloc_mat( size, NULL );
+	zero_mat( tmp_mat );
 
 	for( int i = 0; i < size; ++i )
 		for( int j = 0; j < size; ++j )
 			for( int k = 0; k < size; ++k )
-				*element_mat( dest, i, j ) += *element_mat( m1, i, k ) * *element_mat( m2, k, j );
+				*element_mat( tmp_mat, i, j ) += *element_mat( m1, i, k ) * *element_mat( m2, k, j );
 
+	copy_mat( dest, tmp_mat );
+	destroy_mat( tmp_mat );
 }
 
 // API function to get the (i,j)th submatrix from src
@@ -115,7 +127,12 @@ void add_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 )
 		return;
 
 	int size = dest->size;
+	int tmp_mat = alloc_mat( size, NULL );
+
 	for( int i = 0; i < size; ++i )
 		for( int j = 0; j < size; ++j )
-			*element_mat( dest, i, j ) = *element_mat( m1, i, j ) + *element_mat( m2, i, j );
+			*element_mat( tmp_mat, i, j ) = *element_mat( m1, i, j ) + *element_mat( m2, i, j );
+
+	copy_mat( dest, tmp_mat );
+	destroy_mat( tmp_mat );
 }

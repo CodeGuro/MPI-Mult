@@ -50,15 +50,16 @@ int main( int argc, char **argv )
 	{
 		for( int j = 0; j < steps; ++j )
 		{
-			if( rank == 0 )
-				zero_mat( sub3 );
+			zero_mat( sub3 );
 			for( int k = 0; k < steps; ++k )
 			{
-				if( rank == 0 )
-				{
-					get_sub_mat( sub1, m1, i, k );
-					get_sub_mat( sub2, m2, k, j );
-				}
+				// non-parallel part
+				get_sub_mat( sub1, m1, i, k );
+				get_sub_mat( sub2, m2, k, j );
+				matrix_t *tmp = alloc_mat( sub_size, NULL );
+				multiply_mat( tmp, sub1, sub2 );
+				add_mat( sub3, sub3, tmp );
+				destroy_mat( tmp );
 			}
 		}
 	}
