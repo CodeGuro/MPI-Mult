@@ -54,6 +54,11 @@ int main( int argc, char **argv )
 				zero_mat( sub3 );
 			for( int k = 0; k < steps; ++k )
 			{
+				if( rank == 0 )
+				{
+					get_sub_mat( sub1, m1, i, k );
+					get_sub_mat( sub2, m2, k, j );
+				}
 			}
 		}
 	}

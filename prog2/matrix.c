@@ -107,3 +107,15 @@ void set_sub_mat( matrix_t *dest, matrix_t *src, int i, int j )
 		*element_mat( dest, src->size * i + ii, src->size * j + jj ) = *element_mat( src, ii, jj );
 	}
 }
+
+// API function to add all matrix elements
+void add_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 )
+{
+	if( !( dest->size == m1->size && m1->size == m2->size ) )
+		return;
+
+	int size = dest->size;
+	for( int i = 0; i < size; ++i )
+		for( int j = 0; j < size; ++j )
+			*element_mat( dest, i, j ) = *element_mat( m1, i, j ) + *element_mat( m2, i, j );
+}
