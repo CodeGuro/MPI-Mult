@@ -26,7 +26,11 @@ int main( int argc, char **argv )
 		//print_mat( m1 );
 		//print_mat( m2 );
 		multiply_mat( m3, m1, m2 );
-		print_mat( m3 );
+
+		matrix_t *m4 = alloc_mat( 4, NULL );
+		sub_mat( m4, m3, 1, 1 );
+		print_mat( m4 );
+		destroy_mat( m4 );
 		destroy_mat( m3 );
 		destroy_mat( m2 );
 		destroy_mat( m1 );

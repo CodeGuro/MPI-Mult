@@ -79,3 +79,14 @@ void multiply_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 )
 				*element_mat( dest, i, j ) += *element_mat( m1, i, k ) * *element_mat( m2, k, j );
 
 }
+
+// API function to fill dest with the (i,j)th submatrix of src
+void sub_mat( matrix_t *dest, matrix_t *src, int i, int j )
+{
+	for( int k = 0; k < dest->size * dest->size; ++k )
+	{
+		int ii = k / dest->size;
+		int jj = k % dest->size;
+		*element_mat( dest, ii, jj ) = *element_mat( src, dest->size * i + ii, dest->size * j + jj );
+	}
+}

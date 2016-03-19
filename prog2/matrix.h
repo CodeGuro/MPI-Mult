@@ -13,3 +13,4 @@ void destroy_mat( matrix_t *matrix );
 void print_mat( const matrix_t *matrix );
 void transpose_mat( matrix_t *matrix );
 void multiply_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 );
+void sub_mat( matrix_t *dest, matrix_t *src, int i, int j );
