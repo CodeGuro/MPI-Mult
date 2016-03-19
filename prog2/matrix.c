@@ -27,8 +27,8 @@ void destroy_mat( matrix_t *matrix )
 // API function to display contents of matrix
 void print_mat( const matrix_t *matrix, const char *name, FILE *hfile )
 {
-	printf( "%s, size: %i\n", name, matrix->size );
-	if( hfile ) fprintf( hfile, "%s, size: %i\n", name, matrix->size );
+	printf( "%s, size: %i x %i\n", name, matrix->size, matrix->size );
+	if( hfile ) fprintf( hfile, "%s, size: %i x %i\n", name, matrix->size, matrix->size );
 	for( int i = 0; i < matrix->size; ++i )
 	{
 		// neat spacing in printing

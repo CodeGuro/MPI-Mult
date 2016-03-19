@@ -19,16 +19,37 @@ int main( int argc, char **argv )
 	// read the matrix
 	if( rank == 0 )
 	{
-		FILE *hfile = fopen( "inmatrix12", "r" );
-		fscanf( hfile, "%i", &n );
-		m1 = alloc_mat( n, hfile );
-		m2 = alloc_mat( n, hfile );
-		fclose( hfile );
-		m3 = alloc_mat( n, NULL );
+		char buffer[ 512 ] = { 0 };
+		char *ptr = argc > 1 ? argv[ 1 ] : buffer;
+		if( ptr == buffer )
+		{
+			printf( "Enter the file name: " );
+			gets( buffer );
+		}
+		FILE *hfile = fopen( ptr, "r" );
+		if( hfile == NULL )
+		{
+			n = 0;
+			printf( "file '%s' does not exist, exiting\n", ptr );
+		}
+		else
+		{
+			fscanf( hfile, "%i", &n );
+			m1 = alloc_mat( n, hfile );
+			m2 = alloc_mat( n, hfile );
+			fclose( hfile );
+			m3 = alloc_mat( n, NULL );
+		}
 	}
 
 	// broadcast the size of the matrix
 	MPI_Bcast( &n, 1, MPI_INT, 0, MPI_COMM_WORLD );
+
+	if( n == 0 )
+	{
+		MPI_Finalize();
+		exit( 1 );
+	}
 
 	// exit if p doesn't divide n
 	if( n % p )
@@ -37,14 +58,6 @@ int main( int argc, char **argv )
 			printf( "matrix size not divisible by proc count!\n" );
 		MPI_Finalize();
 		exit( 1 );
-	}
-	else if( rank == 0 )
-	{
-		char filename_buff[ 512 ] = { 0 };
-		sprintf( filename_buff, "outfile%i", n );
-		hfout = fopen( filename_buff, "w" );
-		print_mat( m1, "Matrix A", hfout );
-		print_mat( m2, "Matrix B", hfout );
 	}
 
 	const int sub_size = n / p; // size of the submatrices
@@ -62,6 +75,14 @@ int main( int argc, char **argv )
 
 	if( rank == 0 )
 	{
+		char filename_buff[ 512 ] = { 0 };
+		sprintf( filename_buff, "outmatrix%i", n );
+		hfout = fopen( filename_buff, "w" );
+		printf( "Grid size: %i x %i\n", sub_size, sub_size );
+		fprintf( hfout, "Grid size: %i x %i\n", sub_size, sub_size );
+		print_mat( m1, "Matrix A", hfout );
+		print_mat( m2, "Matrix B", hfout );
+		
 		mat_set_rows = malloc( sub_size*sub_size * steps * sizeof( float ) );
 		mat_set_cols = malloc( sub_size*sub_size * steps * sizeof( float ) );
 		mat_set_Cvec = malloc( sub_size*sub_size * steps * sizeof( float ) );
