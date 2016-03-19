@@ -112,7 +112,7 @@ void get_sub_mat( matrix_t *dest, matrix_t *src, int i, int j )
 // API function to set the (i,j)th submatrix to dest
 void set_sub_mat( matrix_t *dest, matrix_t *src, int i, int j )
 {
-	for( int k = 0; k < dest->size * dest->size; ++k )
+	for( int k = 0; k < src->size * src->size; ++k )
 	{
 		int ii = k / src->size;
 		int jj = k % src->size;

@@ -15,6 +15,8 @@ int main( int argc, char **argv )
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPI_Comm_size( MPI_COMM_WORLD, &p );
 
+	n = p = 3; // debug only
+
 	// read the matrix
 	if( rank == 0 )
 	{
@@ -61,8 +63,11 @@ int main( int argc, char **argv )
 				add_mat( sub3, sub3, tmp );
 				destroy_mat( tmp );
 			}
+			set_sub_mat( m3, sub3, i, j );
 		}
 	}
+
+	print_mat( m3 );
 
 	// free the resources
 	destroy_mat( sub3 );
