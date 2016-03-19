@@ -13,17 +13,21 @@ int main( int argc, char **argv )
 	MPI_Init( &argc, &argv );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPI_Comm_size( MPI_COMM_WORLD, &p );
+	matrix_t *mat_arr;
 
-	if( rank == 0 ) // parent
+	// read the matrix
+	if( rank == 0 )
 	{
-		matrix_t *mat_arr = init_mat_arr( "inmatrix12" );
+		mat_arr = init_mat_arr( "inmatrix12" );
+		n = mat_arr->size;
 		print_mat( mat_arr + 0 );
 		print_mat( mat_arr + 1 );
-		destroy_mat_arr( mat_arr );
-		n = mat_arr->size;
 	}
 
+	// broadcast the size of the matrix
 	MPI_Bcast( &n, 1, MPI_INT, 0, MPI_COMM_WORLD );
+
+	// exit if p doesn't divide n
 	if( n % p )
 	{
 		if( p == 0 )
@@ -32,12 +36,20 @@ int main( int argc, char **argv )
 		exit( 1 );
 	}
 
-	MPI_Comm grid2D;
-	int dimensions[ 2 ] = { n, n };
-	int periodic[ 2 ] = { 0, 0 };
-	MPI_Cart_create( MPI_COMM_WORLD, 2, dimensions, periodic, 0, &grid2D );
+	int steps = p / n; // number of submatrices to evaluate per process
 
-	MPI_Comm_free( &grid2D );
+	if( rank == 0 )
+	{
+		// partition the matrix and broadcast it to the processes
+
+
+
+		destroy_mat_arr( mat_arr );
+	}
+	else
+	{
+
+	}
 
 	MPI_Finalize();
 
