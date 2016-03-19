@@ -8,10 +8,11 @@
 int main( int argc, char **argv )
 {
 	int rank;
-	int size;
+	int p;
+	int n; // matrix size
 	MPI_Init( &argc, &argv );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
-	MPI_Comm_size( MPI_COMM_WORLD, &size );
+	MPI_Comm_size( MPI_COMM_WORLD, &p );
 
 	if( rank == 0 ) // parent
 	{
@@ -19,27 +20,24 @@ int main( int argc, char **argv )
 		print_mat( mat_arr + 0 );
 		print_mat( mat_arr + 1 );
 		destroy_mat_arr( mat_arr );
-
-		if( mat_arr[ 0 ].size % size )
-		{
-			printf( "Matrix size not divisible by process count!\nexiting\n" );
-			MPI_Finalize();
-			return 0;
-		}
-
-		int num = mat_arr[ 0 ].size / size; 
+		n = mat_arr->size;
 	}
-	else // child
+
+	MPI_Bcast( &n, 1, MPI_INT, 0, MPI_COMM_WORLD );
+	if( n % p )
 	{
+		if( p == 0 )
+			printf( "matrix size not divisible by proc count!\n" );
+		MPI_Finalize();
+		exit( 1 );
 	}
 
-/*	int buff[] = { 1, 2, 3, 4, 5, 6 };
-	int recbuff[ 3 ];
-	MPI_Scatter( buff, 3, MPI_INT, recbuff, 3, MPI_INT, 0, MPI_COMM_WORLD );
+	MPI_Comm grid2D;
+	int dimensions[ 2 ] = { n, n };
+	int periodic[ 2 ] = { 0, 0 };
+	MPI_Cart_create( MPI_COMM_WORLD, 2, dimensions, periodic, 0, &grid2D );
 
-	printf( "proc %i recieved %i %i %i\n", rank, recbuff[ 0 ], recbuff[ 1 ], recbuff[ 2 ] );
-*/
-
+	MPI_Comm_free( &grid2D );
 
 	MPI_Finalize();
 
