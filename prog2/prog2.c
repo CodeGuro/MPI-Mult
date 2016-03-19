@@ -15,7 +15,7 @@ int main( int argc, char **argv )
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPI_Comm_size( MPI_COMM_WORLD, &p );
 
-	n = p = 3; // debug only
+	p = 4; // debug only
 
 	// read the matrix
 	if( rank == 0 )
@@ -24,8 +24,9 @@ int main( int argc, char **argv )
 		fscanf( hfile, "%i", &n );
 		m1 = alloc_mat( n, hfile );
 		m2 = alloc_mat( n, hfile );
-		m3 = alloc_mat( n, hfile );
 		fclose( hfile );
+
+		m3 = alloc_mat( n, NULL );
 	}
 
 	// broadcast the size of the matrix
@@ -40,8 +41,8 @@ int main( int argc, char **argv )
 		exit( 1 );
 	}
 
-	int steps = n / p; // number of submatrices to evaluate per process
-	int sub_size = n / steps; // size of the submatrices
+	int sub_size = n / p; // size of the submatrices
+	int steps = n / sub_size; // number of submatrices to evaluate per process
 
 	// allocate the sub-matrices
 	matrix_t *sub1 = alloc_mat( sub_size, NULL );
