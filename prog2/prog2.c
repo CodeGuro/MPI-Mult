@@ -33,7 +33,7 @@ int main( int argc, char **argv )
 	// exit if p doesn't divide n
 	if( n % p )
 	{
-		if( p == 0 )
+		if( rank == 0 )
 			printf( "matrix size not divisible by proc count!\n" );
 		MPI_Finalize();
 		exit( 1 );
