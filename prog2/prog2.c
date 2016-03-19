@@ -13,15 +13,23 @@ int main( int argc, char **argv )
 	MPI_Init( &argc, &argv );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPI_Comm_size( MPI_COMM_WORLD, &p );
-	matrix_t *mat_arr;
 
 	// read the matrix
 	if( rank == 0 )
 	{
-		mat_arr = init_mat_arr( "inmatrix12" );
-		n = mat_arr->size;
-		print_mat( mat_arr + 0 );
-		print_mat( mat_arr + 1 );
+		FILE *hfile = fopen( "inmatrix12", "r" );
+		fscanf( hfile, "%i", &n );
+		matrix_t *m1 = alloc_mat( n, hfile );
+		matrix_t *m2 = alloc_mat( n, hfile );
+		matrix_t *m3 = alloc_mat( n, NULL );
+		fclose( hfile );
+		//print_mat( m1 );
+		//print_mat( m2 );
+		multiply_mat( m3, m1, m2 );
+		print_mat( m3 );
+		destroy_mat( m3 );
+		destroy_mat( m2 );
+		destroy_mat( m1 );
 	}
 
 	// broadcast the size of the matrix
@@ -41,10 +49,6 @@ int main( int argc, char **argv )
 	if( rank == 0 )
 	{
 		// partition the matrix and broadcast it to the processes
-
-
-
-		destroy_mat_arr( mat_arr );
 	}
 	else
 	{
