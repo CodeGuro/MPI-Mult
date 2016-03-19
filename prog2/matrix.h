@@ -17,3 +17,4 @@ void multiply_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 );
 void get_sub_mat( matrix_t *dest, matrix_t *src, int i, int j );
 void set_sub_mat( matrix_t *dest, matrix_t *src, int i, int j );
 void add_mat( matrix_t *dest, matrix_t *m1, matrix_t *m2 );
+void copy_buff_mat( float *buff, matrix_t *src, int idx );
