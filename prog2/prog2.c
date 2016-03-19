@@ -23,6 +23,8 @@ int main( int argc, char **argv )
 		m1 = alloc_mat( n, hfile );
 		m2 = alloc_mat( n, hfile );
 		fclose( hfile );
+		print_mat( m1, "Matrix A" );
+		print_mat( m2, "Matrix B" );
 
 		m3 = alloc_mat( n, NULL );
 	}
@@ -130,7 +132,7 @@ int main( int argc, char **argv )
 
 	if( rank == 0 )
 	{
-		print_mat( m3 );
+		print_mat( m3, "Matrix C" );
 		destroy_mat( m3 );
 		destroy_mat( m2 );
 		destroy_mat( m1 );

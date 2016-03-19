@@ -25,9 +25,9 @@ void destroy_mat( matrix_t *matrix )
 }
 
 // API function to display contents of matrix
-void print_mat( const matrix_t *matrix )
+void print_mat( const matrix_t *matrix, const char *name )
 {
-	printf( "Matrix size: %i\nMatrix contents:\n", matrix->size );
+	printf( "%s, size: %i\n", name, matrix->size );
 	for( int i = 0; i < matrix->size; ++i )
 	{
 		// neat spacing in printing
@@ -35,6 +35,7 @@ void print_mat( const matrix_t *matrix )
 			printf( matrix->mat[ i * matrix->size + j ] < 0.f ? "%.1f\t" : " %.1f\t", matrix->mat[ i * matrix->size + j ] );
 		printf( "\n" );
 	}
+	printf( "\n" );
 }
 
 // API function to copy a matrix from src to dest

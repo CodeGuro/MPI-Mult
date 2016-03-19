@@ -10,7 +10,7 @@ typedef struct
 // API functions defined in matrix.c, main prog in prog2.c
 matrix_t *alloc_mat( int size, FILE *hfile );
 void destroy_mat( matrix_t *matrix );
-void print_mat( const matrix_t *matrix );
+void print_mat( const matrix_t *matrix, const char *name );
 void copy_mat( matrix_t *dest, matrix_t *src );
 void zero_mat( matrix_t *dest );
 void transpose_mat( matrix_t *matrix );
