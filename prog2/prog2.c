@@ -15,7 +15,7 @@ int main( int argc, char **argv )
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPI_Comm_size( MPI_COMM_WORLD, &p );
 
-	p = 4; // debug only
+	p = 1; // debug only
 
 	// read the matrix
 	if( rank == 0 )
@@ -75,7 +75,9 @@ int main( int argc, char **argv )
 		}
 
 		// scatter mat_set_rows to so submat i goes to sub1 in process i
-		MPI_Scatter( mat_set_rows, sub_size*sub_size*steps, MPI_FLOAT, sub1, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+		MPI_Scatter( mat_set_rows, sub_size*sub_size, MPI_FLOAT, sub1->mat, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+
+		print_mat( sub1 );
 
 		for( int j = 0; j < steps; ++j )
 		{
@@ -91,7 +93,7 @@ int main( int argc, char **argv )
 			}
 
 			// scatter mat_set_cols to so submat j goes to sub2 in process j
-			MPI_Scatter( mat_set_cols, sub_size*sub_size, MPI_FLOAT, sub2, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
+			MPI_Scatter( mat_set_cols, sub_size*sub_size, MPI_FLOAT, sub2->mat, sub_size*sub_size, MPI_FLOAT, 0, MPI_COMM_WORLD );
 
 			// perform matrix multiplication here
 			multiply_mat( sub3, sub1, sub2 );
