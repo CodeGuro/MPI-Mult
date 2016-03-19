@@ -8,14 +8,9 @@ const int mat_count = 2;
 void alloc_mat( matrix_t *matrix, int size, FILE *hfile )
 {
 	matrix->size = size;
-	matrix->mat = malloc( matrix->size * sizeof( float* ) );
-	for( int it = 0; it < matrix->size; ++it )
-	{
-		matrix->mat[ it ] = malloc( matrix->size * sizeof( float ) );
-
-		for( int it2 = 0; it2 < matrix->size; ++it2 )
-			fscanf( hfile, "%f", matrix->mat[ it ] + it2 );
-	}
+	matrix->mat = malloc( size * size * sizeof( float ) );
+	for( int it = 0; it < size * size; ++it )
+		fscanf( hfile, "%f", matrix->mat + it );
 }
 
 // API function to initialize two matrices from file
@@ -42,10 +37,14 @@ matrix_t *init_mat_arr( const char *filepath )
 // helper function to destroy resources and prevent memory leaks
 void destroy_mat( matrix_t *matrix )
 {
-	for( int it = 0; it < matrix->size; ++it )
-		free( matrix->mat[ it ] );
-
 	free( matrix->mat );
+}
+
+float *get_element( matrix_t *matrix, int i, int j )
+{
+	if( i < matrix->size && j < matrix->size )
+		return matrix->mat + matrix->size * i + j;
+	return NULL;
 }
 
 // API function to free resources generated from init_mat_arr
@@ -64,7 +63,7 @@ void print_mat( const matrix_t *matrix )
 	{
 		// neat spacing in printing
 		for( int j = 0; j < matrix->size; ++j )
-			printf( matrix->mat[ i ][ j ] < 0.f ? "%.1f\t" : " %.1f\t", matrix->mat[ i ][ j ] );
+			printf( matrix->mat[ i * matrix->size + j ] < 0.f ? "%.1f\t" : " %.1f\t", matrix->mat[ i * matrix->size + j ] );
 		printf( "\n" );
 	}
 }

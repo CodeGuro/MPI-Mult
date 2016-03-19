@@ -4,7 +4,7 @@
 typedef struct
 {
 	int size;
-	float **mat;
+	float *mat;
 } matrix_t;
 
 // API functions defined in matrix.c, main prog in prog2.c
