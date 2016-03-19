@@ -3,7 +3,6 @@
 #include <string.h>
 #include "matrix.h"
 
-const int mat_count = 2;
 
 // API function to fill matrix
 matrix_t *alloc_mat(int size, FILE *hfile )
